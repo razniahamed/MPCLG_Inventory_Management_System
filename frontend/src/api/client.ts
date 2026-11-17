@@ -94,8 +94,9 @@ export async function send<T>(
   method: 'post' | 'put' | 'patch' | 'delete',
   url: string,
   body?: unknown,
+  headers?: Record<string, string>,
 ): Promise<Envelope<T>> {
-  const { data } = await http.request<Envelope<T>>({ method, url, data: body })
+  const { data } = await http.request<Envelope<T>>({ method, url, data: body, headers })
   return data
 }
 

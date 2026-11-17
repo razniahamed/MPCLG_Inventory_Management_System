@@ -13,6 +13,7 @@ use App\Services\Access\Scope;
 use App\Services\Approvals\ApprovalService;
 use App\Services\Audit\AuditLogger;
 use App\Support\DocumentNumber;
+use App\Support\Find;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 
@@ -33,7 +34,7 @@ class TransferService
 
     public function create(array $data): AssetTransfer
     {
-        $asset = Asset::where('public_id', $data['asset_id'])->orWhere('id', $data['asset_id'])->firstOrFail();
+        $asset = Find::byKey(Asset::class, $data['asset_id']);
 
         if ($asset->responsible_department_id) {
             $this->actor->authorize('transfer.create', Scope::department($asset->responsible_department_id));

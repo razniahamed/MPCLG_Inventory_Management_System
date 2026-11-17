@@ -20,6 +20,8 @@ interface Props<T extends GridValidRowModel> {
   onRowClick?: (row: T) => void
   toolbar?: ReactNode
   height?: number | 'auto'
+  /** Send the search box as filter[searchAs] instead of ?search= */
+  searchAs?: string
 }
 
 /** DataGrid wired to the API's page / per_page / sort / search / filter[] params. */
@@ -34,6 +36,7 @@ export function ServerTable<T extends GridValidRowModel>({
   getRowId,
   onRowClick,
   toolbar,
+  searchAs,
 }: Props<T>) {
   const [pagination, setPagination] = useState<GridPaginationModel>({ page: 0, pageSize: 25 })
   const [sortModel, setSortModel] = useState<GridSortModel>(defaultSort)
@@ -56,9 +59,13 @@ export function ServerTable<T extends GridValidRowModel>({
   const query = useQuery({
     queryKey: [...queryKey, 'list', { page: pagination.page, pageSize: pagination.pageSize, sort, search, filtersKey }],
     queryFn: () =>
-      getPage<T>(endpoint, listParams({ page: pagination.page + 1, perPage: pagination.pageSize, sort, search, filters })),
+      getPage<T>(endpoint, listParams({ page: pagination.page + 1, perPage: pagination.pageSize, sort, search: searchAs ? undefined : search, filters: searchAs ? { ...filters, [searchAs]: search } : filters })),
     placeholderData: keepPreviousData,
   })
+
+  // The server may sort by a field that is not a visible column; only give the
+  // grid entries it knows, or it rewrites the model during render.
+  const gridSort = useMemo(() => sortModel.filter((s) => columns.some((c) => c.field === s.field)), [sortModel, columns])
 
   const cols = useMemo(
     () => columns.map((c) => ({ ...c, sortable: c.sortable ?? sortFields.includes(c.field) })),
@@ -66,7 +73,7 @@ export function ServerTable<T extends GridValidRowModel>({
   )
 
   return (
-    <Paper variant="outlined" sx={{ minWidth: 0, overflow: 'hidden' }}>
+    <Paper sx={(t) => ({ minWidth: 0, overflow: 'hidden', borderRadius: 5, border: `1px solid ${t.palette.divider}`, boxShadow: '0 6px 24px rgba(10, 30, 90, 0.06)' })}>
       <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ p: 1.5, alignItems: { md: 'center' } }}>
         <TextField
           value={searchInput}
@@ -99,7 +106,7 @@ export function ServerTable<T extends GridValidRowModel>({
         filterMode="server"
         paginationModel={pagination}
         onPaginationModelChange={setPagination}
-        sortModel={sortModel}
+        sortModel={gridSort}
         onSortModelChange={setSortModel}
         pageSizeOptions={[10, 25, 50, 100]}
         disableRowSelectionOnClick
@@ -112,7 +119,9 @@ export function ServerTable<T extends GridValidRowModel>({
           borderColor: 'divider',
           borderRadius: 0,
           '& .MuiDataGrid-row': { cursor: onRowClick ? 'pointer' : 'default' },
-          '& .MuiDataGrid-columnHeaderTitle': { fontWeight: 600 },
+          '& .MuiDataGrid-columnHeaders': { bgcolor: 'action.hover' },
+          '& .MuiDataGrid-columnHeaderTitle': { fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'text.secondary' },
+          '& .MuiDataGrid-cell': { display: 'flex', alignItems: 'center' },
         }}
       />
     </Paper>

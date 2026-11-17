@@ -31,7 +31,7 @@ export interface FieldDef {
   /** Dropdown filled from an API list endpoint. */
   lookup?: { endpoint: string; label: (row: Record<string, unknown>) => string; sort?: string }
   helper?: string
-  width?: 6 | 12
+  width?: 4 | 6 | 12
   defaultValue?: unknown
 }
 

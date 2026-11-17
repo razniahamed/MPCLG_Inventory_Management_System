@@ -3,7 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import { send } from '../../api/client'
 import { errorMessage } from '../../components/Notify'
-import { AuthShell } from './AuthShell'
+import { AuthShell, glassField } from './AuthShell'
 
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -26,16 +26,16 @@ export function ForgotPasswordPage() {
   }
 
   return (
-    <AuthShell title="Reset your password" subtitle="Enter the email on your account. If it belongs to an active account, we will send a reset link.">
+    <AuthShell title="Reset your" accent="password" subtitle="Enter the email on your account. If it belongs to an active account, we will send a reset link.">
       <form onSubmit={submit}>
         <Stack spacing={2}>
           {done && <Alert severity="success">{done}</Alert>}
           {error && <Alert severity="error">{error}</Alert>}
-          <TextField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required size="medium" autoFocus />
+          <TextField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required size="medium" sx={glassField} autoFocus />
           <Button type="submit" variant="contained" size="large" disabled={busy || !email}>
             {busy ? 'Sending…' : 'Send reset link'}
           </Button>
-          <Link component={RouterLink} to="/login" sx={{ fontSize: 14, alignSelf: 'center' }}>
+          <Link component={RouterLink} to="/login" sx={{ fontSize: 14, alignSelf: 'center', color: '#9fd3ff' }}>
             Back to sign in
           </Link>
         </Stack>

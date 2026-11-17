@@ -5,6 +5,7 @@ import { Box, Button, IconButton, MenuItem, Stack, TextField, Tooltip } from '@m
 import type { GridColDef } from '@mui/x-data-grid'
 import { useQueryClient } from '@tanstack/react-query'
 import { useState, type ReactNode } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { send } from '../../api/client'
 import type { MasterRecord } from '../../api/types'
 import { useAuth } from '../../auth/AuthContext'
@@ -27,6 +28,8 @@ export interface MasterDataConfig {
   defaultSort?: { field: string; sort: 'asc' | 'desc' }
   /** Extra per-row actions (e.g. store officers). */
   rowActions?: (row: MasterRecord) => ReactNode
+  /** Open a detail page when a row is clicked. */
+  rowLink?: (row: MasterRecord) => string
   /** Extra toolbar filters rendered next to search. */
   filters?: { name: string; label: string; options: { value: string; label: string }[] }[]
 }
@@ -34,6 +37,7 @@ export interface MasterDataConfig {
 export function MasterDataPage({ config }: { config: MasterDataConfig }) {
   const { can } = useAuth()
   const notify = useNotify()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const manage = can(config.managePermission)
 
@@ -60,7 +64,7 @@ export function MasterDataPage({ config }: { config: MasterDataConfig }) {
             sortable: false,
             align: 'right',
             renderCell: ({ row }) => (
-              <Stack direction="row" spacing={0.5} sx={{ justifyContent: 'flex-end', height: '100%', alignItems: 'center' }}>
+              <Stack direction="row" spacing={0.5} onClick={(e) => e.stopPropagation()} sx={{ justifyContent: 'flex-end', height: '100%', alignItems: 'center' }}>
                 {config.rowActions?.(row)}
                 {manage && (
                   <>
@@ -103,6 +107,7 @@ export function MasterDataPage({ config }: { config: MasterDataConfig }) {
         sortFields={config.sortFields}
         defaultSort={config.defaultSort ? [config.defaultSort] : []}
         filters={{ is_active: active, ...extra }}
+        onRowClick={config.rowLink ? (row) => navigate(config.rowLink!(row)) : undefined}
         toolbar={
           <>
             <TextField select label="Status" value={active} onChange={(e) => setActive(e.target.value)} sx={{ width: { xs: '100%', sm: 140 } }}>

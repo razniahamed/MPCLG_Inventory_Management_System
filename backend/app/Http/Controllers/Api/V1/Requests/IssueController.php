@@ -10,6 +10,7 @@ use App\Models\Issue;
 use App\Services\Access\Actor;
 use App\Services\Requests\IssueService;
 use App\Support\ApiResponse;
+use App\Support\Find;
 use App\Support\Idempotency;
 use App\Support\ListQuery;
 use Illuminate\Http\JsonResponse;
@@ -68,7 +69,7 @@ class IssueController extends Controller
             'lines.*.batch_no' => ['nullable', 'string', 'max:60'],
             'lines.*.asset_id' => ['nullable', 'integer', Rule::exists('assets', 'id')],
         ]);
-        $data['request_id'] = GoodsRequest::where('public_id', $data['request_id'])->orWhere('id', $data['request_id'])->valueOrFail('id');
+        $data['request_id'] = Find::byKey(GoodsRequest::class, $data['request_id'])->id;
 
         $issue = $this->issues->create($data);
 

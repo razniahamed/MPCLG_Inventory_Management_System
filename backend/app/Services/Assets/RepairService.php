@@ -16,6 +16,7 @@ use App\Services\Approvals\ApprovalService;
 use App\Services\Audit\AuditLogger;
 use App\Support\Dec;
 use App\Support\DocumentNumber;
+use App\Support\Find;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 
@@ -35,7 +36,7 @@ class RepairService
 
     public function create(array $data): RepairCase
     {
-        $asset = Asset::where('public_id', $data['asset_id'])->orWhere('id', $data['asset_id'])->firstOrFail();
+        $asset = Find::byKey(Asset::class, $data['asset_id']);
         $this->actor->authorize('repair.create', $asset->responsible_department_id ? Scope::department($asset->responsible_department_id) : null);
         $officer = $this->actor->officer();
 

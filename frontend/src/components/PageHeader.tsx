@@ -19,11 +19,11 @@ export function PageHeader({
         <Breadcrumbs sx={{ mb: 1, fontSize: 13 }}>
           {crumbs.map((c) =>
             c.to ? (
-              <Link key={c.label} component={RouterLink} to={c.to} underline="hover" color="inherit">
+              <Link key={c.label} component={RouterLink} to={c.to} underline="hover" color="inherit" sx={{ fontWeight: 600 }}>
                 {c.label}
               </Link>
             ) : (
-              <Typography sx={{ fontSize: 13 }} key={c.label} color="text.primary">
+              <Typography key={c.label} color="text.primary" sx={{ fontSize: 13, fontWeight: 600 }}>
                 {c.label}
               </Typography>
             ),
@@ -36,12 +36,16 @@ export function PageHeader({
             {title}
           </Typography>
           {subtitle && (
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, maxWidth: 900 }}>
               {subtitle}
             </Typography>
           )}
         </Box>
-        {actions && <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>{actions}</Stack>}
+        {actions && (
+          <Stack direction="row" spacing={1} useFlexGap sx={{ flexShrink: 0, flexWrap: 'wrap' }}>
+            {actions}
+          </Stack>
+        )}
       </Stack>
     </Box>
   )

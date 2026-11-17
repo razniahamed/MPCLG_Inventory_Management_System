@@ -35,6 +35,11 @@ class PermissionResolver
     /** @var array<int, array{division_id: int, parent_department_id: ?int}>|null */
     private ?array $departmentMap = null;
 
+    /** @var array<string, array>|null per-instance memo of the permission catalogue switches */
+    private ?array $metaMemo = null;
+
+    private ?int $metaVersion = null;
+
     public function __construct(private readonly AccessCache $cache) {}
 
     /**
@@ -51,13 +56,14 @@ class PermissionResolver
      *
      * @return array{allowed: bool, reason: string, sources: array<int, array>}
      */
-    public function explain(User $user, string $code, ?Scope $scope = null, bool $fresh = false): array
+    public function explain(User $user, string $code, ?Scope $scope = null, bool $fresh = false, ?array $preloaded = null): array
     {
         if (! $user->isActive()) {
             return $this->decision(false, $user->isLocked() ? 'account_locked' : 'account_not_active');
         }
 
-        $meta = $this->permissionMeta()[$code] ?? null;
+        // Batch mode (preloaded grants) reuses the catalogue snapshot taken for the batch.
+        $meta = ($preloaded !== null && $this->metaMemo !== null ? $this->metaMemo : $this->permissionMeta())[$code] ?? null;
         if ($meta === null) {
             return $this->decision(false, 'unknown_permission');
         }
@@ -69,7 +75,7 @@ class PermissionResolver
         }
 
         $grants = array_values(array_filter(
-            $this->grants($user, $fresh)[$code] ?? [],
+            ($preloaded ?? $this->grants($user, $fresh))[$code] ?? [],
             fn (array $g) => $this->isCurrent($g),
         ));
 
@@ -118,8 +124,9 @@ class PermissionResolver
     public function effectivePermissions(User $user): array
     {
         $result = [];
+        $grants = $this->grants($user);
         foreach (array_keys($this->permissionMeta()) as $code) {
-            $decision = $this->explain($user, $code);
+            $decision = $this->explain($user, $code, null, false, $grants);
             if ($decision['allowed']) {
                 $result[$code] = array_map(fn ($g) => [
                     'scope_type' => $g['scope_type'],
@@ -177,6 +184,7 @@ class PermissionResolver
     public function flushMemo(): void
     {
         $this->memo = [];
+        $this->metaMemo = null;
         $this->departmentMap = null;
     }
 
@@ -185,7 +193,11 @@ class PermissionResolver
      */
     public function permissionMeta(): array
     {
-        $key = 'access.permission_meta.g'.$this->cache->globalVersion();
+        $global = $this->cache->globalVersion();
+        if ($this->metaMemo !== null && $this->metaVersion === $global && ! $this->inTransaction()) {
+            return $this->metaMemo;
+        }
+        $key = 'access.permission_meta.g'.$global;
         $build = fn () => Permission::query()
             ->join('modules', 'modules.id', '=', 'permissions.module_id')
             ->get(['permissions.code', 'permissions.is_enabled', 'permissions.is_sensitive', 'modules.is_enabled as module_enabled'])
@@ -199,7 +211,9 @@ class PermissionResolver
             return $build();
         }
 
-        return Cache::remember($key, config('mpclg.permission_cache_ttl'), $build);
+        $this->metaVersion = $global;
+
+        return $this->metaMemo = Cache::remember($key, config('mpclg.permission_cache_ttl'), $build);
     }
 
     /** @return array<string, array<int, array>> */

@@ -1111,6 +1111,13 @@ All paths are under `/api/v1`. The right-hand column is the permission required.
 - **Maintenance (P7):** `/warranties`, `/repair-cases` (+ `/assess`, `/approve`, `/dispatch`, `/updates`, `/return`, `/test`, `/close`), `/service-schedules`, `/asset-verifications`, `/valuations`, `/disposals`
 - **Reports (P8):** `/dashboard/{role}`, `/reports/*`, `/exports/*`, `/documents/{type}/{id}/print`
 
+**As built (Phases 2–7):** the routes live in `backend/routes/api_v1_operations.php` (required inside the authenticated group of `api_v1.php`); `php artisan route:list --path=api/v1` is the authoritative list. Notes:
+- Every `{id}` accepts either the numeric id or the record's `public_id` (ULID), resolved by `App\Support\Find::byKey` — never `where(public_id)->orWhere(id)`, which casts a ULID to a number and can match the wrong row.
+- Posting endpoints (`/grns/{id}/approve-post`, `/issues/{id}/post`, adjustments, returns) honour an `Idempotency-Key` header (rule 4).
+- A route may require one of several permissions with `permission:a|b` (still exactly one `permission:` middleware per route).
+- `GET /dashboard` returns the signed-in user's open tasks (requests to certify/approve/issue, GRNs, transfers, meter readings …) and headline figures, limited to their scopes. Role dashboards and reports remain Phase 8.
+- Approval chains are data: `WorkflowSeeder` seeds `approval_flows`/`approval_steps` for `GOODS_REQUEST`, `A4_REQUEST`, `GRN`, `STOCK_ADJUSTMENT`, `ASSET_TRANSFER`, `REPAIR_DISPATCH`, `VALUE_CHANGE` and `DISPOSAL`.
+
 ---
 
 ## 11. Business rules the code MUST enforce (invariants)
@@ -1203,6 +1210,20 @@ Write a Pest feature test for **every endpoint** (allowed, denied, validation, e
 - [x] 11. Organisation master-data endpoints.
 - [x] 12. Audit logging listener on all write services.
 - [x] 13. Tests (Phase 1 extra tests in Section 13) and OpenAPI docs.
+
+### 14.2 Phases 2–7 status
+
+- [x] **P2 Catalogue** — categories, units, items, approved pack conversions, suppliers (duplicate checks).
+- [x] **P3 Receiving and ledger** — PO references, GRN draft → inspect → approve-and-post, supplier returns, append-only `stock_ledger`, `stock_balances` with row locks, counts with recount, adjustments with independent approval.
+- [x] **P4 Requests and issues** — versioned requests, certify/approve/reduce/return/reject, reservations, partial issues, receipt acknowledgement, discrepancies, department returns.
+- [x] **P5 A4 control** — machines and counters, meter observations with flags (decrease, overlap, unusual increase, missing photo, baseline), shared-usage allocation, paper statements, A4 exceptions.
+- [x] **P6 Assets and QR** — register, permanent QR token and printable label, scan page, custody history, transfers and loans (In Transit until received).
+- [x] **P7 Maintenance and verification** — warranties (linked extensions), repair cases (closure only after a passed test), service schedules, verification sessions, valuations, disposals.
+- [ ] **P8 Reports and documents**, **P9 Migration and go-live** — not started.
+
+Deviations from Section 7: tables are grouped one migration per Section 7.x (`2026_11_18_10000{1..6}_*`) rather than one per table; foreign keys that feed generated columns or CHECK constraints are created without `ON UPDATE CASCADE` (MySQL restriction). Acceptance tests are in `backend/tests/Feature/Operations/*`.
+
+**Demo data:** `php artisan db:seed --class=DemoDataSeeder` (after `migrate:fresh --seed`) adds three stores, 17 items, 5 suppliers, POs and GRNs, requests in every state, A4 machines and readings, 15 assets with transfers/repairs/valuation/disposal, and 12 demo users (password `Demo@12345`). Never run it in production.
 
 ---
 

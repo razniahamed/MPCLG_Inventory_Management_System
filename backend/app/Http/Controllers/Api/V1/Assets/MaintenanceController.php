@@ -16,6 +16,7 @@ use App\Services\Approvals\ApprovalService;
 use App\Services\Assets\AssetLifecycleService;
 use App\Services\Assets\RepairService;
 use App\Support\ApiResponse;
+use App\Support\Find;
 use App\Support\ListQuery;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -164,7 +165,7 @@ class MaintenanceController extends Controller
     {
         $this->actor->authorize('service.manage');
         $data = $request->validate([
-            'asset_id' => ['required', 'integer', Rule::exists('assets', 'id')],
+            'asset_id' => ['required'],
             'service_type' => ['required', 'string', 'max:60'],
             'interval_days' => ['nullable', 'integer', 'min:1'],
             'usage_threshold' => ['nullable', 'integer', 'min:1'],
@@ -172,6 +173,7 @@ class MaintenanceController extends Controller
             'next_due_on' => ['nullable', 'date'],
             'responsible_officer_id' => ['nullable', 'integer', Rule::exists('officers', 'id')],
         ]);
+        $data['asset_id'] = Find::byKey(Asset::class, $data['asset_id'])->id;
         if (empty($data['next_due_on']) && ! empty($data['interval_days'])) {
             $data['next_due_on'] = now()->parse($data['last_service_on'] ?? now())->addDays($data['interval_days'])->toDateString();
         }

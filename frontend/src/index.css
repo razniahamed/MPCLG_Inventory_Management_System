@@ -8,3 +8,33 @@ body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Printing: forms and QR labels print without the app chrome. */
+@media print {
+  header,
+  nav,
+  footer,
+  .no-print,
+  .MuiDrawer-root,
+  .MuiAppBar-root,
+  .MuiButton-root {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  .MuiDialog-root .print-area {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 24px;
+  }
+}

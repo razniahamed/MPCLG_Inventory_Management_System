@@ -156,13 +156,14 @@ class RequestController extends Controller
 
     private function present(GoodsRequest $request): array
     {
-        $request->load([...self::WITH, 'allLines.item:id,item_code,name_en,tracking_method', 'allLines.unit:id,code,name', 'issues:id,public_id,request_id,issue_no,status,issue_on', 'paperStatement', 'meterObservations.machine:id,code', 'a4Exceptions']);
+        $request->load([...self::WITH, 'allLines.item:id,item_code,name_en,tracking_method,base_unit_id', 'allLines.item.baseUnit:id,code', 'allLines.unit:id,code,name', 'issues:id,public_id,request_id,issue_no,status,issue_on', 'paperStatement', 'meterObservations.machine:id,code', 'a4Exceptions']);
         $data = (new MasterRecordResource($request))->resolve(request());
         unset($data['all_lines']);
 
         $data['lines'] = $request->currentLinesLoaded()->map(fn ($l) => (new MasterRecordResource($l))->resolve(request()) + [
             'outstanding_qty' => $l->outstandingQty(),
             'available_in_store' => $this->ledger->available($l->item_id, $request->store_id),
+            'base_unit' => $l->item?->baseUnit?->code,
         ])->all();
         $data['previous_versions'] = $request->allLines->where('version_no', '<', $request->current_version_no)->groupBy('version_no')->keys()->values();
         $data['approvals'] = $this->approvals->history($request);

@@ -76,7 +76,7 @@ class GrnService
             $this->writeLines($grn, $data['lines'], $po);
             $this->audit->log(AuditAction::Created, $grn, null, ['grn_no' => $grn->grn_no, 'store_id' => $grn->store_id], $data['reason'] ?? null);
 
-            return $grn;
+            return $grn->fresh();
         });
     }
 

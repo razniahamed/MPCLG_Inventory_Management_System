@@ -36,7 +36,7 @@ export function ResetPasswordPage() {
 
   if (!token || !email) {
     return (
-      <AuthShell title="Reset link incomplete">
+      <AuthShell title="Reset link" accent="incomplete">
         <Alert severity="warning">This link is missing information. Request a new one.</Alert>
         <Link component={RouterLink} to="/forgot-password" sx={{ display: 'block', mt: 2 }}>
           Request a new reset link
@@ -46,7 +46,7 @@ export function ResetPasswordPage() {
   }
 
   return (
-    <AuthShell title="Choose a new password" subtitle={`For ${email}`}>
+    <AuthShell title="Choose a new" accent="password" subtitle={`For ${email}`}>
       <form onSubmit={submit}>
         <Stack spacing={2}>
           {error !== null && <Alert severity="error">{error instanceof ApiError ? error.field('token') ?? errorMessage(error) : errorMessage(error)}</Alert>}

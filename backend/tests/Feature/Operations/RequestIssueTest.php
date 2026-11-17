@@ -104,6 +104,16 @@ it('serialises competing issues so the approved quantity is never exceeded (acce
     expect(StockBalance::where('item_id', $this->item->id)->value('on_hand_usable'))->toBe('15.000');
 });
 
+it('issues against the right request when given its public id (ULID is never read as a number)', function () {
+    $first = approvedRequest($this, 10, 8);
+    $second = approvedRequest($this, 4, 4);
+
+    $issue = issue($this, $second, 2);
+
+    expect($issue['request']['request_no'])->toBe($second['request_no'])
+        ->and($issue['request']['request_no'])->not->toBe($first['request_no']);
+});
+
 it('is idempotent when the same posting is repeated', function () {
     $request = approvedRequest($this);
     $draft = issue($this, $request, 5);

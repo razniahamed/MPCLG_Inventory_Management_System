@@ -27,16 +27,31 @@ npm run lint
 For a separately hosted build set `VITE_API_BASE_URL` to the full API URL (e.g. `https://inventory.ministry.lk/api/v1`)
 and add the UI origin to the API's `FRONTEND_URL` (CORS).
 
-## Screens (Phase 1)
+## Screens
 
 | Area | Screens |
 |---|---|
 | Sign-in | Login, forced password change (temporary passwords), forgot / reset password |
-| Home | Dashboard (counts, my access, build progress, recent activity), My account |
+| Home | Dashboard (welcome hero, stock/asset figures, "Waiting for you" task list, assets by status), My account |
+| Requests | Requests (create, submit, certify, approve/reduce, return, reject, cancel, approval timeline), Issues (prepare, post, acknowledge receipt), Returns to stores |
+| Stores & stock | Stock balances, Stock ledger, Stock counts (count, recount, close), Adjustments, Discrepancies |
+| Receiving | Purchase orders, Goods received (inspect, approve and post, reverse), Supplier returns |
+| A4 paper | Machines, Meter readings (flags, verify), Shared usage, Paper statements, A4 exceptions |
+| Assets | Asset register (QR label printing), Transfers & loans, Scan QR |
+| Maintenance | Warranties, Repairs, Service schedules, Verification, Valuations, Disposals |
+| Catalogue | Items (with pack conversions), Categories, Units, Suppliers |
 | Access control | Users (list, create with one-time temporary password, detail with lifecycle actions, role assignment with scope and end date, **per-user permission On / Off / Role default switches**, activity), Roles (list, permission matrix editor), Permission catalogue (global switches), Modules, Delegations, Audit trail, Settings |
 | Organisation | Divisions, Departments, Officers (with assignment history and transfers), Sites, Stores (with store officers), Locations, Designations, Public services, Service grades |
 
 Every change that the API audits asks for a reason in the UI. Times are shown in Asia/Colombo.
+The look (gradient blue sidebar and top bar, rounded cards, glass sign-in) follows `../referance system dashboard.png`
+and `../referance system login.png`; colours live in `src/theme.ts`.
+
+## Demo accounts
+
+After `php artisan migrate:fresh --seed` and `php artisan db:seed --class=DemoDataSeeder` in `../backend`, sign in with
+any of these (`<name>@mpclg.gov.lk`, password `Demo@12345`): `stores.keeper`, `receiving.officer`, `accountant.supply`,
+`chief.accountant`, `cfo`, `it.clerk`, `it.director`, `legal.clerk`, `legal.head`, `repair.coord`, `auditor`, `staff.user`.
 
 ## Layout
 

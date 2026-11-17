@@ -16,6 +16,7 @@ use App\Services\Access\Actor;
 use App\Services\Approvals\ApprovalService;
 use App\Services\Audit\AuditLogger;
 use App\Support\DocumentNumber;
+use App\Support\Find;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -281,6 +282,6 @@ class AssetLifecycleService
 
     private function asset(mixed $id): Asset
     {
-        return Asset::where('public_id', $id)->orWhere('id', $id)->firstOrFail();
+        return Find::byKey(Asset::class, $id);
     }
 }

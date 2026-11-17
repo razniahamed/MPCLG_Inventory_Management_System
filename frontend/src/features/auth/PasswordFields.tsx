@@ -1,6 +1,7 @@
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 import { Box, Stack, TextField, Typography } from '@mui/material'
+import { glassField } from './AuthShell'
 
 const RULES: { label: string; test: (p: string) => boolean }[] = [
   { label: 'At least 10 characters', test: (p) => p.length >= 10 },
@@ -29,12 +30,12 @@ export function PasswordFields({
 }) {
   return (
     <Stack spacing={2}>
-      <TextField label="New password" type="password" value={password} onChange={(e) => onPassword(e.target.value)} autoComplete="new-password" required size="medium" error={Boolean(serverError)} helperText={serverError} />
+      <TextField label="New password" type="password" value={password} onChange={(e) => onPassword(e.target.value)} autoComplete="new-password" required size="medium" sx={glassField} error={Boolean(serverError)} helperText={serverError} />
       <Box>
         {RULES.map((r) => {
           const ok = r.test(password)
           return (
-            <Stack key={r.label} direction="row" spacing={1} sx={{ alignItems: 'center', color: ok ? 'success.main' : 'text.secondary' }}>
+            <Stack key={r.label} direction="row" spacing={1} sx={{ alignItems: 'center', color: ok ? '#4ade80' : 'rgba(220,232,255,0.6)' }}>
               {ok ? <CheckCircleIcon sx={{ fontSize: 16 }} /> : <RadioButtonUncheckedIcon sx={{ fontSize: 16 }} />}
               <Typography sx={{ fontSize: 13 }}>{r.label}</Typography>
             </Stack>
@@ -49,6 +50,7 @@ export function PasswordFields({
         autoComplete="new-password"
         required
         size="medium"
+        sx={glassField}
         error={confirm.length > 0 && confirm !== password}
         helperText={confirm.length > 0 && confirm !== password ? 'Passwords do not match.' : undefined}
       />

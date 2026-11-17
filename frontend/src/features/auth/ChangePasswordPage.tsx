@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { ApiError, send } from '../../api/client'
 import { useAuth } from '../../auth/AuthContext'
 import { errorMessage, useNotify } from '../../components/Notify'
-import { AuthShell } from './AuthShell'
+import { AuthShell, glassField } from './AuthShell'
 import { PasswordFields, passwordOk } from './PasswordFields'
 
 export function ChangePasswordPage() {
@@ -39,7 +39,8 @@ export function ChangePasswordPage() {
 
   return (
     <AuthShell
-      title={forced ? 'Set your own password' : 'Change password'}
+      title={forced ? 'Set your own' : 'Change your'}
+      accent="password"
       subtitle={forced ? 'You signed in with a temporary password. Choose a new one to continue.' : 'Other signed-in devices will be signed out.'}
     >
       <form onSubmit={submit}>
@@ -52,7 +53,7 @@ export function ChangePasswordPage() {
             onChange={(e) => setCurrent(e.target.value)}
             autoComplete="current-password"
             required
-            size="medium"
+            size="medium" sx={glassField}
             error={Boolean(fieldErr('current_password'))}
             helperText={fieldErr('current_password')}
           />
@@ -61,9 +62,9 @@ export function ChangePasswordPage() {
             {busy ? 'Saving…' : 'Change password'}
           </Button>
           {forced ? (
-            <Button onClick={() => void logout()}>Sign out</Button>
+            <Button onClick={() => void logout()} sx={{ color: '#cfe1ff' }}>Sign out</Button>
           ) : (
-            <Button onClick={() => navigate(-1)}>Cancel</Button>
+            <Button onClick={() => navigate(-1)} sx={{ color: '#cfe1ff' }}>Cancel</Button>
           )}
         </Stack>
       </form>
