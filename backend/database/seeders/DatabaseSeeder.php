@@ -12,6 +12,8 @@ class DatabaseSeeder extends Seeder
             AccessControlSeeder::class,
             OrganisationSeeder::class,
             SystemSettingSeeder::class,
+            WorkflowSeeder::class,
+            CatalogueReferenceSeeder::class,
             BootstrapAdminSeeder::class,
         ]);
     }

@@ -25,7 +25,14 @@ class CheckPermission
             throw new ApiException('Unauthenticated.', 'UNAUTHENTICATED', 401);
         }
 
-        $decision = $this->resolver->explain($user, $permission);
+        // "a|b" = any one of these codes (used by list endpoints shared by
+        // view_own / view_department / view_all style permission families).
+        foreach (explode('|', $permission) as $code) {
+            $decision = $this->resolver->explain($user, $code);
+            if ($decision['allowed']) {
+                return $next($request);
+            }
+        }
 
         if (! $decision['allowed']) {
             $message = match ($decision['reason']) {

@@ -15,6 +15,8 @@ class TestingSeeder extends Seeder
             AccessControlSeeder::class,
             OrganisationSeeder::class,
             SystemSettingSeeder::class,
+            WorkflowSeeder::class,
+            CatalogueReferenceSeeder::class,
         ]);
     }
 }

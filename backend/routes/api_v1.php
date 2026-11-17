@@ -119,4 +119,7 @@ Route::middleware(['auth:sanctum', 'active', 'password.changed', 'throttle:api']
     Route::put('stores/{store}/officers', [StoreController::class, 'syncOfficers'])->middleware('permission:store.manage');
     Route::get('officers/{officer}/assignments', [OfficerController::class, 'assignments'])->middleware('permission:officer.view');
     Route::post('officers/{officer}/assignments', [OfficerController::class, 'addAssignment'])->middleware('permission:officer.manage');
+
+    // Phases 2–7: catalogue, receiving, stock, requests, A4, assets, maintenance.
+    require __DIR__.'/api_v1_operations.php';
 });

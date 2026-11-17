@@ -79,7 +79,7 @@ abstract class TestCase extends BaseTestCase
         return $this->userWithRoles(['system_admin'], $attributes);
     }
 
-    protected function actingAsUser(User $user): static
+    public function actingAsUser(User $user): static
     {
         Sanctum::actingAs($user, ['*']);
 

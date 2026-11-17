@@ -44,13 +44,50 @@ class Columns
     /**
      * FK with the project default: ON DELETE RESTRICT, ON UPDATE CASCADE.
      */
-    public static function fk(Blueprint $table, string $column, string $on, bool $nullable = false): void
+    public static function fk(Blueprint $table, string $column, string $on, bool $nullable = false, bool $cascadeUpdate = true): void
     {
         $definition = $table->foreignId($column);
         if ($nullable) {
             $definition->nullable();
         }
-        $definition->constrained($on)->restrictOnDelete()->cascadeOnUpdate();
+        $definition = $definition->constrained($on)->restrictOnDelete();
+        // MySQL forbids CHECK constraints on columns with referential actions,
+        // so columns used in a CHECK pass $cascadeUpdate = false.
+        $cascadeUpdate ? $definition->cascadeOnUpdate() : $definition->restrictOnUpdate();
+    }
+
+    /** Officer FK used in CHECK constraints (no ON UPDATE CASCADE). */
+    public static function officer(Blueprint $table, string $column, bool $nullable = false, bool $inCheck = false): void
+    {
+        self::fk($table, $column, 'officers', $nullable, ! $inCheck);
+    }
+
+    /** [std] for tables created after `users`: audit columns with their FKs in place. */
+    public static function stdLinked(Blueprint $table): void
+    {
+        $table->dateTime('created_at')->nullable();
+        $table->dateTime('updated_at')->nullable();
+        $table->foreignId('created_by')->nullable()->constrained('users')->restrictOnDelete()->cascadeOnUpdate();
+        $table->foreignId('updated_by')->nullable()->constrained('users')->restrictOnDelete()->cascadeOnUpdate();
+    }
+
+    public static function masterLinked(Blueprint $table): void
+    {
+        $table->boolean('is_active')->default(true)->index();
+        self::stdLinked($table);
+        $table->dateTime('deleted_at')->nullable();
+    }
+
+    public static function appendLinked(Blueprint $table): void
+    {
+        $table->dateTime('created_at')->nullable();
+        $table->foreignId('created_by')->nullable()->constrained('users')->restrictOnDelete()->cascadeOnUpdate();
+    }
+
+    /** Public ULID for tables exposed through URLs. */
+    public static function publicId(Blueprint $table): void
+    {
+        $table->char('public_id', 26)->unique();
     }
 
     /**
