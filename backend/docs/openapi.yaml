@@ -1,0 +1,5106 @@
+openapi: 3.0.3
+info:
+  title: 'MPCLG Inventory & Asset Management API (v1)'
+  description: 'API-first backend for the Ministry inventory and asset management system. Every protected endpoint requires exactly one permission code; see MPCLG_Inventory_System_Blueprint.md.'
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost:8000'
+tags:
+  -
+    name: Endpoints
+    description: ''
+components:
+  securitySchemes:
+    default:
+      type: http
+      scheme: bearer
+      description: 'Get a token from <code>POST /api/v1/auth/login</code> and send it as <code>Authorization: Bearer {token}</code>. Tokens expire after 8 hours by default.'
+security:
+  -
+    default: []
+paths:
+  /api/v1/health:
+    get:
+      summary: 'Service health check (public).'
+      operationId: serviceHealthCheckpublic
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: true
+                  message: 'Service is running.'
+                  data:
+                    status: ok
+                    database: ok
+                    version: v1
+                    time: '2026-11-17T08:34:42+00:00'
+                  meta:
+                    request_id: 01M7MA9RGRF9APY8RF48FW3RQ4
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Service is running.'
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: ok
+                      database:
+                        type: string
+                        example: ok
+                      version:
+                        type: string
+                        example: v1
+                      time:
+                        type: string
+                        example: '2026-11-17T08:34:42+00:00'
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RGRF9APY8RF48FW3RQ4
+      tags:
+        - Endpoints
+      security: []
+  /api/v1/auth/login:
+    post:
+      summary: 'Sign in with username (or email) and password. Returns a bearer token.'
+      operationId: signInWithUsernameorEmailAndPasswordReturnsABearerToken
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: 'Invalid username or password.'
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RJXS9NQZVG4TEPT1ME3
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Invalid username or password.'
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RJXS9NQZVG4TEPT1ME3
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: 'Must not be greater than 190 characters.'
+                  example: b
+                password:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: ']|{+-0pBNvYg'
+                device_name:
+                  type: string
+                  description: 'Must not be greater than 100 characters.'
+                  example: h
+                  nullable: true
+              required:
+                - username
+                - password
+      security: []
+  /api/v1/auth/forgot-password:
+    post:
+      summary: ''
+      operationId: postApiV1AuthForgotPassword
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: true
+                  message: 'If the address belongs to an active account, a reset link has been sent.'
+                  data: null
+                  meta:
+                    request_id: 01M7MA9RPKF0SNTNK65JZZTF3X
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'If the address belongs to an active account, a reset link has been sent.'
+                  data:
+                    type: string
+                    example: null
+                    nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RPKF0SNTNK65JZZTF3X
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 190 characters.'
+                  example: gbailey@example.net
+              required:
+                - email
+      security: []
+  /api/v1/auth/reset-password:
+    post:
+      summary: ''
+      operationId: postApiV1AuthResetPassword
+      description: ''
+      parameters: []
+      responses:
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: 'Validation failed.'
+                  code: VALIDATION_ERROR
+                  errors:
+                    password:
+                      - 'The password field confirmation does not match.'
+                      - 'The password field must be at least 10 characters.'
+                      - 'The password field must contain at least one uppercase and one lowercase letter.'
+                      - 'The password field must contain at least one letter.'
+                      - 'The password field must contain at least one number.'
+                  meta:
+                    request_id: 01M7MA9RR7MZE2V5YPQ7BF8NPY
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Validation failed.'
+                  code:
+                    type: string
+                    example: VALIDATION_ERROR
+                  errors:
+                    type: object
+                    properties:
+                      password:
+                        type: array
+                        example:
+                          - 'The password field confirmation does not match.'
+                          - 'The password field must be at least 10 characters.'
+                          - 'The password field must contain at least one uppercase and one lowercase letter.'
+                          - 'The password field must contain at least one letter.'
+                          - 'The password field must contain at least one number.'
+                        items:
+                          type: string
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RR7MZE2V5YPQ7BF8NPY
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 190 characters.'
+                  example: gbailey@example.net
+                token:
+                  type: string
+                  description: ''
+                  example: architecto
+                password:
+                  type: string
+                  description: ''
+                  example: '|]|{+-'
+              required:
+                - email
+                - token
+                - password
+      security: []
+  /api/v1/auth/logout:
+    post:
+      summary: 'Revoke the current token.'
+      operationId: revokeTheCurrentToken
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RRYEFWSHYA2VZVH8JZ6
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RRYEFWSHYA2VZVH8JZ6
+      tags:
+        - Endpoints
+  /api/v1/auth/me:
+    get:
+      summary: 'Profile, effective permissions and enabled modules (for showing / hiding features).'
+      operationId: profileEffectivePermissionsAndEnabledModulesforShowingHidingFeatures
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RS7NC66AFKMM22SS3SA
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RS7NC66AFKMM22SS3SA
+      tags:
+        - Endpoints
+  /api/v1/auth/change-password:
+    post:
+      summary: ''
+      operationId: postApiV1AuthChangePassword
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RSD5AVDKVM9K64B0F5S
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RSD5AVDKVM9K64B0F5S
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                current_password:
+                  type: string
+                  description: ''
+                  example: architecto
+                password:
+                  type: string
+                  description: ''
+                  example: '|]|{+-'
+              required:
+                - current_password
+                - password
+  /api/v1/users:
+    get:
+      summary: ''
+      operationId: getApiV1Users
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RSTEFV7J440EBFZ2S98
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RSTEFV7J440EBFZ2S98
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1Users
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RTBKS0Q5PW6G7BNGT6X
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RTBKS0Q5PW6G7BNGT6X
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: 'Must match the regex /^[A-Za-z0-9._-]+$/. Must be at least 3 characters. Must not be greater than 60 characters.'
+                  example: b
+                email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 190 characters.'
+                  example: zbailey@example.net
+                officer_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                password:
+                  type: string
+                  description: ''
+                  example: '|]|{+-'
+                  nullable: true
+                roles:
+                  type: array
+                  description: ''
+                  example: null
+                  items:
+                    type: object
+                    nullable: true
+                    properties:
+                      role:
+                        type: string
+                        description: 'Must match an existing stored value.'
+                        example: architecto
+                      scope_type:
+                        type: string
+                        description: ''
+                        example: division
+                        enum:
+                          - global
+                          - division
+                          - department
+                          - store
+                        nullable: true
+                      scope_id:
+                        type: integer
+                        description: ''
+                        example: 16
+                        nullable: true
+                      valid_from:
+                        type: string
+                        description: 'Must be a valid date.'
+                        example: '2026-11-17T08:34:42'
+                        nullable: true
+                      valid_to:
+                        type: string
+                        description: 'Must be a valid date. Must be a date after <code>now</code>.'
+                        example: '2052-12-10'
+                        nullable: true
+                    required:
+                      - role
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: v
+                  nullable: true
+              required:
+                - username
+                - email
+  '/api/v1/users/{user_public_id}':
+    get:
+      summary: ''
+      operationId: getApiV1UsersUser_public_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RTNSH9AWKTCNCDWK9P3
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RTNSH9AWKTCNCDWK9P3
+      tags:
+        - Endpoints
+    patch:
+      summary: ''
+      operationId: patchApiV1UsersUser_public_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RV0RDABRKP2066BZT8K
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RV0RDABRKP2066BZT8K
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: 'Must match the regex /^[A-Za-z0-9._-]+$/. Must be at least 3 characters. Must not be greater than 60 characters.'
+                  example: b
+                email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 190 characters.'
+                  example: zbailey@example.net
+                officer_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: 'n'
+                  nullable: true
+    parameters:
+      -
+        in: path
+        name: user_public_id
+        description: 'The ID of the user public.'
+        example: 01M7M9PK9E5GFRYGAVX8D77FGM
+        required: true
+        schema:
+          type: string
+  '/api/v1/users/{user_public_id}/suspend':
+    post:
+      summary: ''
+      operationId: postApiV1UsersUser_public_idSuspend
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RV9BZV0MD5YHAHS2SW6
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RV9BZV0MD5YHAHS2SW6
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: b
+              required:
+                - reason
+    parameters:
+      -
+        in: path
+        name: user_public_id
+        description: 'The ID of the user public.'
+        example: 01M7M9PK9E5GFRYGAVX8D77FGM
+        required: true
+        schema:
+          type: string
+  '/api/v1/users/{user_public_id}/deactivate':
+    post:
+      summary: ''
+      operationId: postApiV1UsersUser_public_idDeactivate
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RVJTGEDK59AW042MG9W
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RVJTGEDK59AW042MG9W
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: b
+              required:
+                - reason
+    parameters:
+      -
+        in: path
+        name: user_public_id
+        description: 'The ID of the user public.'
+        example: 01M7M9PK9E5GFRYGAVX8D77FGM
+        required: true
+        schema:
+          type: string
+  '/api/v1/users/{user_public_id}/reactivate':
+    post:
+      summary: ''
+      operationId: postApiV1UsersUser_public_idReactivate
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RVV10QQ08TZ2TS0D0MJ
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RVV10QQ08TZ2TS0D0MJ
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: b
+              required:
+                - reason
+    parameters:
+      -
+        in: path
+        name: user_public_id
+        description: 'The ID of the user public.'
+        example: 01M7M9PK9E5GFRYGAVX8D77FGM
+        required: true
+        schema:
+          type: string
+  '/api/v1/users/{user_public_id}/reset-password':
+    post:
+      summary: ''
+      operationId: postApiV1UsersUser_public_idResetPassword
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RW68BWVJ7RPXQ970BJ1
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RW68BWVJ7RPXQ970BJ1
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: b
+              required:
+                - reason
+    parameters:
+      -
+        in: path
+        name: user_public_id
+        description: 'The ID of the user public.'
+        example: 01M7M9PK9E5GFRYGAVX8D77FGM
+        required: true
+        schema:
+          type: string
+  '/api/v1/users/{user_public_id}/revoke-tokens':
+    post:
+      summary: ''
+      operationId: postApiV1UsersUser_public_idRevokeTokens
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RWFJJGTY6PPP7VCN7TA
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RWFJJGTY6PPP7VCN7TA
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: b
+              required:
+                - reason
+    parameters:
+      -
+        in: path
+        name: user_public_id
+        description: 'The ID of the user public.'
+        example: 01M7M9PK9E5GFRYGAVX8D77FGM
+        required: true
+        schema:
+          type: string
+  '/api/v1/users/{user_public_id}/effective-permissions':
+    get:
+      summary: 'Why a user can / cannot do each thing (shows role / override / delegation sources).'
+      operationId: whyAUserCanCannotDoEachThingshowsRoleOverrideDelegationSources
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RX0K9HCVEZWJ3Z0BTS5
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RX0K9HCVEZWJ3Z0BTS5
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: user_public_id
+        description: 'The ID of the user public.'
+        example: 01M7M9PK9E5GFRYGAVX8D77FGM
+        required: true
+        schema:
+          type: string
+  '/api/v1/users/{user_public_id}/roles':
+    get:
+      summary: 'Role assignments (current and, with ?history=1, ended ones too).'
+      operationId: roleAssignmentscurrentAndWithhistory1EndedOnesToo
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RX6DN2VQXGC42SCR21R
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RX6DN2VQXGC42SCR21R
+      tags:
+        - Endpoints
+    put:
+      summary: 'Replace or merge role assignments (with scope and validity).'
+      operationId: replaceOrMergeRoleAssignmentswithScopeAndValidity
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RXE09PJ03G2VBQ1NR09
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RXE09PJ03G2VBQ1NR09
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mode:
+                  type: string
+                  description: ''
+                  example: replace
+                  enum:
+                    - replace
+                    - merge
+                roles:
+                  type: array
+                  description: ''
+                  example: null
+                  items:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                        description: 'Must match an existing stored value.'
+                        example: architecto
+                      scope_type:
+                        type: string
+                        description: ''
+                        example: store
+                        enum:
+                          - global
+                          - division
+                          - department
+                          - store
+                        nullable: true
+                      scope_id:
+                        type: integer
+                        description: ''
+                        example: 16
+                        nullable: true
+                      valid_from:
+                        type: string
+                        description: 'Must be a valid date.'
+                        example: '2026-11-17T08:34:42'
+                        nullable: true
+                      valid_to:
+                        type: string
+                        description: 'Must be a valid date. Must be a date after <code>now</code>.'
+                        example: '2052-12-10'
+                        nullable: true
+                    required:
+                      - role
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: b
+              required:
+                - mode
+                - reason
+    parameters:
+      -
+        in: path
+        name: user_public_id
+        description: 'The ID of the user public.'
+        example: 01M7M9PK9E5GFRYGAVX8D77FGM
+        required: true
+        schema:
+          type: string
+  '/api/v1/users/{user_public_id}/permissions':
+    get:
+      summary: 'Per-user overrides (current and, with ?history=1, revoked / expired).'
+      operationId: perUserOverridescurrentAndWithhistory1RevokedExpired
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RXN7XWKSX9321Q853S9
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RXN7XWKSX9321Q853S9
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: user_public_id
+        description: 'The ID of the user public.'
+        example: 01M7M9PK9E5GFRYGAVX8D77FGM
+        required: true
+        schema:
+          type: string
+  '/api/v1/users/{user_public_id}/permissions/{permission_code}':
+    put:
+      summary: 'Turn ONE permission allow / deny / inherit for ONE user.'
+      operationId: turnONEPermissionAllowDenyInheritForONEUser
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RY18EMGCGJVDQSC6ZTM
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RY18EMGCGJVDQSC6ZTM
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                effect:
+                  type: string
+                  description: ''
+                  example: allow
+                  enum:
+                    - allow
+                    - deny
+                    - inherit
+                scope:
+                  type: object
+                  description: ''
+                  example: null
+                  properties:
+                    scope_type:
+                      type: string
+                      description: 'This field is required when <code>scope</code> is present.'
+                      example: division
+                      enum:
+                        - global
+                        - division
+                        - department
+                        - store
+                    scope_id:
+                      type: integer
+                      description: ''
+                      example: 16
+                      nullable: true
+                  nullable: true
+                valid_from:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-11-17T08:34:42'
+                  nullable: true
+                valid_to:
+                  type: string
+                  description: 'Must be a valid date. Must be a date after <code>now</code>.'
+                  example: '2052-12-10'
+                  nullable: true
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: 'n'
+              required:
+                - effect
+                - reason
+    parameters:
+      -
+        in: path
+        name: user_public_id
+        description: 'The ID of the user public.'
+        example: 01M7M9PK9E5GFRYGAVX8D77FGM
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: permission_code
+        description: ''
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/roles:
+    get:
+      summary: ''
+      operationId: getApiV1Roles
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RYMHZ382HVNVKJCPWVY
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RYMHZ382HVNVKJCPWVY
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1Roles
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RYYCPXQHTR0DPTZ84EC
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RYYCPXQHTR0DPTZ84EC
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'Must match the regex /^[a-z][a-z0-9_]*$/. Must not be greater than 50 characters.'
+                  example: b
+                name:
+                  type: string
+                  description: 'Must not be greater than 100 characters.'
+                  example: 'n'
+                description:
+                  type: string
+                  description: 'Must not be greater than 2000 characters.'
+                  example: 'Animi quos velit et fugiat.'
+                  nullable: true
+                permissions:
+                  type: array
+                  description: ''
+                  example:
+                    - architecto
+                  items:
+                    type: string
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: 'n'
+                  nullable: true
+              required:
+                - code
+                - name
+  '/api/v1/roles/{role_id}':
+    get:
+      summary: ''
+      operationId: getApiV1RolesRole_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RZBRKK12S83W092Y1X6
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RZBRKK12S83W092Y1X6
+      tags:
+        - Endpoints
+    patch:
+      summary: ''
+      operationId: patchApiV1RolesRole_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RZKS8BDSNNBK94FHJJ0
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RZKS8BDSNNBK94FHJJ0
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 100 characters.'
+                  example: b
+                description:
+                  type: string
+                  description: 'Must not be greater than 2000 characters.'
+                  example: 'Et animi quos velit et fugiat.'
+                  nullable: true
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: true
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: d
+                  nullable: true
+    delete:
+      summary: 'Delete a non-system role that nobody holds (soft delete).'
+      operationId: deleteANonSystemRoleThatNobodyHoldssoftDelete
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9RZTDTSFGM5M0FWQ6ZH9
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9RZTDTSFGM5M0FWQ6ZH9
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: b
+              required:
+                - reason
+    parameters:
+      -
+        in: path
+        name: role_id
+        description: 'The ID of the role.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/roles/{role_id}/permissions':
+    put:
+      summary: "Replace the role's permission set."
+      operationId: replaceTheRolesPermissionSet
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S0439P61QPZPVNCSFGG
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S0439P61QPZPVNCSFGG
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permissions:
+                  type: array
+                  description: ''
+                  example:
+                    - architecto
+                  items:
+                    type: string
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: 'n'
+              required:
+                - reason
+    parameters:
+      -
+        in: path
+        name: role_id
+        description: 'The ID of the role.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/permissions:
+    get:
+      summary: 'The permission catalogue grouped by module.'
+      operationId: thePermissionCatalogueGroupedByModule
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S0C63H35ZTVHHJS4H4H
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S0C63H35ZTVHHJS4H4H
+      tags:
+        - Endpoints
+  '/api/v1/permissions/{permission_id}/enabled':
+    patch:
+      summary: 'Global on/off switch for one permission (affects every user).'
+      operationId: globalOnoffSwitchForOnePermissionaffectsEveryUser
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S0M6EH06EGBDCJDYNZ1
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S0M6EH06EGBDCJDYNZ1
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_enabled:
+                  type: boolean
+                  description: ''
+                  example: false
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: b
+              required:
+                - is_enabled
+                - reason
+    parameters:
+      -
+        in: path
+        name: permission_id
+        description: 'The ID of the permission.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/modules:
+    get:
+      summary: ''
+      operationId: getApiV1Modules
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S0V5THJ37JN9FW53NCD
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S0V5THJ37JN9FW53NCD
+      tags:
+        - Endpoints
+  '/api/v1/modules/{module_id}/enabled':
+    patch:
+      summary: 'Switch a whole module on/off (e.g. for phased go-live).'
+      operationId: switchAWholeModuleOnoffegForPhasedGoLive
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S131FH1DBTQT2KBMD5C
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S131FH1DBTQT2KBMD5C
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_enabled:
+                  type: boolean
+                  description: ''
+                  example: true
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: b
+              required:
+                - is_enabled
+                - reason
+    parameters:
+      -
+        in: path
+        name: module_id
+        description: 'The ID of the module.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/delegations:
+    get:
+      summary: ''
+      operationId: getApiV1Delegations
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S1CSPPXZ5FC2TZYR97Q
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S1CSPPXZ5FC2TZYR97Q
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1Delegations
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S1NVSG63T8SYAM99KMJ
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S1NVSG63T8SYAM99KMJ
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                delegator_user_id:
+                  type: string
+                  description: 'Must match an existing stored value.'
+                  example: architecto
+                delegate_user_id:
+                  type: string
+                  description: 'The value and <code>delegator_user_id</code> must be different. Must match an existing stored value.'
+                  example: architecto
+                permission_code:
+                  type: string
+                  description: 'Must match an existing stored value.'
+                  example: architecto
+                  nullable: true
+                scope:
+                  type: object
+                  description: ''
+                  example: null
+                  properties:
+                    scope_type:
+                      type: string
+                      description: 'This field is required when <code>scope</code> is present.'
+                      example: division
+                      enum:
+                        - global
+                        - division
+                        - department
+                        - store
+                    scope_id:
+                      type: integer
+                      description: ''
+                      example: 16
+                      nullable: true
+                  nullable: true
+                valid_from:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-11-17T08:34:42'
+                valid_to:
+                  type: string
+                  description: 'Must be a valid date. Must be a date after <code>valid_from</code>. Must be a date after <code>now</code>.'
+                  example: '2052-12-10'
+                written_reference:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 190 characters.'
+                  example: 'n'
+                attachment_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: 'n'
+                  nullable: true
+              required:
+                - delegator_user_id
+                - delegate_user_id
+                - valid_from
+                - valid_to
+                - written_reference
+  '/api/v1/delegations/{delegation_id}':
+    get:
+      summary: ''
+      operationId: getApiV1DelegationsDelegation_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S1XP1YQHX8AB2C434SY
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S1XP1YQHX8AB2C434SY
+      tags:
+        - Endpoints
+    patch:
+      summary: 'Shorten / extend the end date or correct the written reference.'
+      operationId: shortenExtendTheEndDateOrCorrectTheWrittenReference
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S25QC7NZQCYTD1TVMHN
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S25QC7NZQCYTD1TVMHN
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                valid_to:
+                  type: string
+                  description: 'Must be a valid date. Must be a date after <code>now</code>.'
+                  example: '2052-12-10'
+                written_reference:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 190 characters.'
+                  example: 'n'
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: g
+              required:
+                - reason
+    delete:
+      summary: 'Revoke (records are kept; nothing is deleted).'
+      operationId: revokerecordsAreKeptNothingIsDeleted
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S2DKH5M2RNY2B4VXZFF
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S2DKH5M2RNY2B4VXZFF
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: b
+              required:
+                - reason
+    parameters:
+      -
+        in: path
+        name: delegation_id
+        description: 'The ID of the delegation.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  /api/v1/audit-logs:
+    get:
+      summary: 'Search the audit trail.'
+      operationId: searchTheAuditTrail
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S2NNDARB490C4ZB4NVE
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S2NNDARB490C4ZB4NVE
+      tags:
+        - Endpoints
+  /api/v1/settings:
+    get:
+      summary: ''
+      operationId: getApiV1Settings
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S2Z5DKHWPR5NJJXZQSN
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S2Z5DKHWPR5NJJXZQSN
+      tags:
+        - Endpoints
+    patch:
+      summary: ''
+      operationId: patchApiV1Settings
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S388X30DPDFFJE7D8SD
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S388X30DPDFFJE7D8SD
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                settings:
+                  type: array
+                  description: 'Must have at least 1 items.'
+                  example:
+                    - []
+                  items:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                        description: ''
+                        example: auth.temp_password_length
+                        enum:
+                          - auth.max_failed_logins
+                          - auth.lockout_minutes
+                          - auth.token_ttl_minutes
+                          - auth.password_min_length
+                          - auth.temp_password_length
+                          - auth.mfa_required_for_admins
+                          - org.ministry_name
+                          - qr.public_landing
+                          - a4.rule_mode
+                          - a4.photo_required
+                      value:
+                        type: string
+                        description: ''
+                        example: null
+                    required:
+                      - key
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: b
+              required:
+                - settings
+                - reason
+  /api/v1/divisions:
+    get:
+      summary: ''
+      operationId: getApiV1Divisions
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S3K2TGKEKF7KVFYN6QG
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S3K2TGKEKF7KVFYN6QG
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1Divisions
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S3WZ9D3DP3JY8KJ3QTB
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S3WZ9D3DP3JY8KJ3QTB
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: b
+                name_en:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: 'n'
+                name_si:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: g
+                  nullable: true
+                name_ta:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: z
+                  nullable: true
+                head_designation_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                sort_order:
+                  type: integer
+                  description: ''
+                  example: 16
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: 'n'
+                  nullable: true
+              required:
+                - code
+                - name_en
+  '/api/v1/divisions/{division_id}':
+    get:
+      summary: ''
+      operationId: getApiV1DivisionsDivision_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S4584X94BWHK9GCVCV8
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S4584X94BWHK9GCVCV8
+      tags:
+        - Endpoints
+    patch:
+      summary: ''
+      operationId: patchApiV1DivisionsDivision_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S4HDCD3PKQY9JR0PSKF
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S4HDCD3PKQY9JR0PSKF
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: b
+                name_en:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: 'n'
+                name_si:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: g
+                  nullable: true
+                name_ta:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: z
+                  nullable: true
+                head_designation_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                sort_order:
+                  type: integer
+                  description: ''
+                  example: 16
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: 'n'
+                  nullable: true
+    delete:
+      summary: ''
+      operationId: deleteApiV1DivisionsDivision_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S4Q5T784DGZVSG2SQEE
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S4Q5T784DGZVSG2SQEE
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: division_id
+        description: 'The ID of the division.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/departments:
+    get:
+      summary: ''
+      operationId: getApiV1Departments
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S57NT5CXSA9SPF6KSMH
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S57NT5CXSA9SPF6KSMH
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1Departments
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S5NMDMKZ3W7ZG45HWWG
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S5NMDMKZ3W7ZG45HWWG
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: b
+                name_en:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: 'n'
+                name_si:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: g
+                  nullable: true
+                name_ta:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: z
+                  nullable: true
+                division_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                parent_department_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                head_officer_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                coordinator_officer_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                default_site_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                active_from:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-11-17T08:34:42'
+                active_to:
+                  type: string
+                  description: 'Must be a valid date. Must be a date after or equal to <code>active_from</code>.'
+                  example: '2052-12-10'
+                  nullable: true
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: 'n'
+                  nullable: true
+              required:
+                - code
+                - name_en
+                - division_id
+                - active_from
+  '/api/v1/departments/{department_id}':
+    get:
+      summary: ''
+      operationId: getApiV1DepartmentsDepartment_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S5YDFM549Y337SV7X06
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S5YDFM549Y337SV7X06
+      tags:
+        - Endpoints
+    patch:
+      summary: ''
+      operationId: patchApiV1DepartmentsDepartment_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S69NKJQGGGVD6RY79C8
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S69NKJQGGGVD6RY79C8
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: b
+                name_en:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: 'n'
+                name_si:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: g
+                  nullable: true
+                name_ta:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: z
+                  nullable: true
+                division_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                parent_department_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                head_officer_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                coordinator_officer_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                default_site_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                active_from:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-11-17T08:34:43'
+                active_to:
+                  type: string
+                  description: 'Must be a valid date. Must be a date after or equal to <code>active_from</code>.'
+                  example: '2052-12-10'
+                  nullable: true
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: 'n'
+                  nullable: true
+    delete:
+      summary: ''
+      operationId: deleteApiV1DepartmentsDepartment_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S6HX5F0F969Y5ASS7EP
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S6HX5F0F969Y5ASS7EP
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: department_id
+        description: 'The ID of the department.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/sites:
+    get:
+      summary: ''
+      operationId: getApiV1Sites
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S6RGE4ENX8NYN52R8JD
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S6RGE4ENX8NYN52R8JD
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1Sites
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S71T0PNTZ37B2A478CG
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S71T0PNTZ37B2A478CG
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: b
+                name:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: 'n'
+                site_type:
+                  type: string
+                  description: ''
+                  example: main_office
+                  enum:
+                    - main_office
+                    - bungalow
+                    - related_institution
+                    - warehouse
+                    - other
+                address:
+                  type: string
+                  description: 'Must not be greater than 2000 characters.'
+                  example: g
+                  nullable: true
+                phone:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: z
+                  nullable: true
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: m
+                  nullable: true
+              required:
+                - code
+                - name
+                - site_type
+  '/api/v1/sites/{site_id}':
+    get:
+      summary: ''
+      operationId: getApiV1SitesSite_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S7A151T15KFNY9GBHAH
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S7A151T15KFNY9GBHAH
+      tags:
+        - Endpoints
+    patch:
+      summary: ''
+      operationId: patchApiV1SitesSite_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S7K8FZ7ZA125VAYSMCY
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S7K8FZ7ZA125VAYSMCY
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: b
+                name:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: 'n'
+                site_type:
+                  type: string
+                  description: ''
+                  example: related_institution
+                  enum:
+                    - main_office
+                    - bungalow
+                    - related_institution
+                    - warehouse
+                    - other
+                address:
+                  type: string
+                  description: 'Must not be greater than 2000 characters.'
+                  example: g
+                  nullable: true
+                phone:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: z
+                  nullable: true
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: m
+                  nullable: true
+    delete:
+      summary: ''
+      operationId: deleteApiV1SitesSite_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S7TGQ408PNPZNDS7BZ3
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S7TGQ408PNPZNDS7BZ3
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: site_id
+        description: 'The ID of the site.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/stores:
+    get:
+      summary: ''
+      operationId: getApiV1Stores
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S80VN6NX9M8T2NGCFH1
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S80VN6NX9M8T2NGCFH1
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1Stores
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S8AT8G5MYB19QARB0ZZ
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S8AT8G5MYB19QARB0ZZ
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: b
+                name:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: 'n'
+                site_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                store_type:
+                  type: string
+                  description: ''
+                  example: furniture
+                  enum:
+                    - general
+                    - stationery
+                    - it
+                    - furniture
+                    - other
+                  nullable: true
+                responsible_officer_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: 'n'
+                  nullable: true
+              required:
+                - code
+                - name
+                - site_id
+  '/api/v1/stores/{store_id}':
+    get:
+      summary: ''
+      operationId: getApiV1StoresStore_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S8KCQVMM58NG783E6PQ
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S8KCQVMM58NG783E6PQ
+      tags:
+        - Endpoints
+    patch:
+      summary: ''
+      operationId: patchApiV1StoresStore_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S8Y39DGCG6PNMEYPE6H
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S8Y39DGCG6PNMEYPE6H
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: b
+                name:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: 'n'
+                site_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                store_type:
+                  type: string
+                  description: ''
+                  example: general
+                  enum:
+                    - general
+                    - stationery
+                    - it
+                    - furniture
+                    - other
+                  nullable: true
+                responsible_officer_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: 'n'
+                  nullable: true
+    delete:
+      summary: ''
+      operationId: deleteApiV1StoresStore_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S94MTNXZGQE87P53C3S
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S94MTNXZGQE87P53C3S
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: store_id
+        description: 'The ID of the store.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  /api/v1/locations:
+    get:
+      summary: ''
+      operationId: getApiV1Locations
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S9FS6SGS96G81468PN9
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S9FS6SGS96G81468PN9
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1Locations
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9S9WBQ325351YQ24P27K
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9S9WBQ325351YQ24P27K
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                site_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                store_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                parent_location_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                location_type:
+                  type: string
+                  description: ''
+                  example: cupboard
+                  enum:
+                    - room
+                    - shelf
+                    - rack
+                    - cupboard
+                    - other
+                code:
+                  type: string
+                  description: 'Must not be greater than 40 characters.'
+                  example: 'n'
+                name:
+                  type: string
+                  description: 'Must not be greater than 120 characters.'
+                  example: g
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: true
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: z
+                  nullable: true
+              required:
+                - site_id
+                - location_type
+                - code
+                - name
+  '/api/v1/locations/{location_id}':
+    get:
+      summary: ''
+      operationId: getApiV1LocationsLocation_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SA6YZJBVDD6GFTWW0ES
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SA6YZJBVDD6GFTWW0ES
+      tags:
+        - Endpoints
+    patch:
+      summary: ''
+      operationId: patchApiV1LocationsLocation_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SAGH6FS2MTZMK5H7AKB
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SAGH6FS2MTZMK5H7AKB
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                site_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                store_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                parent_location_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                location_type:
+                  type: string
+                  description: ''
+                  example: rack
+                  enum:
+                    - room
+                    - shelf
+                    - rack
+                    - cupboard
+                    - other
+                code:
+                  type: string
+                  description: 'Must not be greater than 40 characters.'
+                  example: 'n'
+                name:
+                  type: string
+                  description: 'Must not be greater than 120 characters.'
+                  example: g
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: true
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: z
+                  nullable: true
+    delete:
+      summary: ''
+      operationId: deleteApiV1LocationsLocation_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SAQW0AREPHKBY3GKV10
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SAQW0AREPHKBY3GKV10
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: location_id
+        description: 'The ID of the location.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  /api/v1/designations:
+    get:
+      summary: ''
+      operationId: getApiV1Designations
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SAX5XRGCBFHYXRKWSNF
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SAX5XRGCBFHYXRKWSNF
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1Designations
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SB67DKNWY5A91JB291S
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SB67DKNWY5A91JB291S
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: b
+                name:
+                  type: string
+                  description: 'Must not be greater than 120 characters.'
+                  example: 'n'
+                category:
+                  type: string
+                  description: ''
+                  example: clerical
+                  enum:
+                    - executive
+                    - professional
+                    - clerical
+                    - technical
+                    - minor
+                    - contract
+                  nullable: true
+                is_head_post:
+                  type: boolean
+                  description: ''
+                  example: false
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: g
+                  nullable: true
+              required:
+                - code
+                - name
+  '/api/v1/designations/{designation_id}':
+    get:
+      summary: ''
+      operationId: getApiV1DesignationsDesignation_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SBENPE7XQ52KA94EHVM
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SBENPE7XQ52KA94EHVM
+      tags:
+        - Endpoints
+    patch:
+      summary: ''
+      operationId: patchApiV1DesignationsDesignation_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SBPZRKFB3ZESYZEM3XX
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SBPZRKFB3ZESYZEM3XX
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: b
+                name:
+                  type: string
+                  description: 'Must not be greater than 120 characters.'
+                  example: 'n'
+                category:
+                  type: string
+                  description: ''
+                  example: minor
+                  enum:
+                    - executive
+                    - professional
+                    - clerical
+                    - technical
+                    - minor
+                    - contract
+                  nullable: true
+                is_head_post:
+                  type: boolean
+                  description: ''
+                  example: false
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: g
+                  nullable: true
+    delete:
+      summary: ''
+      operationId: deleteApiV1DesignationsDesignation_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SC4THTJRMDB6EWYJQ2G
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SC4THTJRMDB6EWYJQ2G
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: designation_id
+        description: 'The ID of the designation.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/public-services:
+    get:
+      summary: ''
+      operationId: getApiV1PublicServices
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SCE47NB5CD9NDGJCGYY
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SCE47NB5CD9NDGJCGYY
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1PublicServices
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SCR76CSX0TFJCWYAYMX
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SCR76CSX0TFJCWYAYMX
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: b
+                name:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: 'n'
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: true
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: g
+                  nullable: true
+              required:
+                - code
+                - name
+  '/api/v1/public-services/{public_service_id}':
+    get:
+      summary: ''
+      operationId: getApiV1PublicServicesPublic_service_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SD8Y74CSRYV54EKE8HA
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SD8Y74CSRYV54EKE8HA
+      tags:
+        - Endpoints
+    patch:
+      summary: ''
+      operationId: patchApiV1PublicServicesPublic_service_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SDH20J0CA25GCE49GBS
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SDH20J0CA25GCE49GBS
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: b
+                name:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: 'n'
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: g
+                  nullable: true
+    delete:
+      summary: ''
+      operationId: deleteApiV1PublicServicesPublic_service_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SDWMATRWFAF7MX0KY7B
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SDWMATRWFAF7MX0KY7B
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: public_service_id
+        description: 'The ID of the public service.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/service-grades:
+    get:
+      summary: ''
+      operationId: getApiV1ServiceGrades
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SE4JV7WNDJRB7VR4R0B
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SE4JV7WNDJRB7VR4R0B
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1ServiceGrades
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SEB92RFJENB1H2GDYRW
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SEB92RFJENB1H2GDYRW
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                public_service_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                code:
+                  type: string
+                  description: 'Must not be greater than 20 characters.'
+                  example: ngzmiyvdljnikhwa
+                rank:
+                  type: integer
+                  description: ''
+                  example: 16
+                  nullable: true
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: 'n'
+                  nullable: true
+              required:
+                - public_service_id
+                - code
+  '/api/v1/service-grades/{service_grade_id}':
+    get:
+      summary: ''
+      operationId: getApiV1ServiceGradesService_grade_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SEK0CST2CADNR9GJG3T
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SEK0CST2CADNR9GJG3T
+      tags:
+        - Endpoints
+    patch:
+      summary: ''
+      operationId: patchApiV1ServiceGradesService_grade_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SEVFJ88XC0VZ7BKZTGK
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SEVFJ88XC0VZ7BKZTGK
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                public_service_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                code:
+                  type: string
+                  description: 'Must not be greater than 20 characters.'
+                  example: ngzmiyvdljnikhwa
+                rank:
+                  type: integer
+                  description: ''
+                  example: 16
+                  nullable: true
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: 'n'
+                  nullable: true
+    delete:
+      summary: ''
+      operationId: deleteApiV1ServiceGradesService_grade_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SF1FPEMV4STE5JGSQG5
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SF1FPEMV4STE5JGSQG5
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: service_grade_id
+        description: 'The ID of the service grade.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/officers:
+    get:
+      summary: ''
+      operationId: getApiV1Officers
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SFDHVG27EQFK1RAEQSH
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SFDHVG27EQFK1RAEQSH
+      tags:
+        - Endpoints
+    post:
+      summary: ''
+      operationId: postApiV1Officers
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SFVCQFXBTZTFPM2BX6Z
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SFVCQFXBTZTFPM2BX6Z
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                officer_no:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: b
+                full_name:
+                  type: string
+                  description: 'Must not be greater than 190 characters.'
+                  example: 'n'
+                name_with_initials:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: g
+                  nullable: true
+                designation_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                department_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                public_service_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                service_grade_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                work_phone:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: 'n'
+                  nullable: true
+                work_email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 190 characters.'
+                  example: ashly64@example.com
+                  nullable: true
+                employment_status:
+                  type: string
+                  description: ''
+                  example: suspended
+                  enum:
+                    - active
+                    - transferred
+                    - retired
+                    - resigned
+                    - suspended
+                joined_on:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-11-17T08:34:43'
+                  nullable: true
+                left_on:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-11-17T08:34:43'
+                  nullable: true
+                authority_ref:
+                  type: string
+                  description: 'Must not be greater than 190 characters.'
+                  example: v
+                  nullable: true
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: d
+                  nullable: true
+              required:
+                - officer_no
+                - full_name
+                - designation_id
+                - department_id
+  '/api/v1/officers/{officer_id}':
+    get:
+      summary: ''
+      operationId: getApiV1OfficersOfficer_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SG5AXBP80F1ZC4NBM6R
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SG5AXBP80F1ZC4NBM6R
+      tags:
+        - Endpoints
+    patch:
+      summary: ''
+      operationId: patchApiV1OfficersOfficer_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SGHV3B0VB707GEP4AMW
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SGHV3B0VB707GEP4AMW
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                officer_no:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: b
+                full_name:
+                  type: string
+                  description: 'Must not be greater than 190 characters.'
+                  example: 'n'
+                name_with_initials:
+                  type: string
+                  description: 'Must not be greater than 150 characters.'
+                  example: g
+                  nullable: true
+                designation_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                department_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                public_service_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                service_grade_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                work_phone:
+                  type: string
+                  description: 'Must not be greater than 30 characters.'
+                  example: 'n'
+                  nullable: true
+                work_email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 190 characters.'
+                  example: ashly64@example.com
+                  nullable: true
+                employment_status:
+                  type: string
+                  description: ''
+                  example: transferred
+                  enum:
+                    - active
+                    - transferred
+                    - retired
+                    - resigned
+                    - suspended
+                joined_on:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-11-17T08:34:43'
+                  nullable: true
+                left_on:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-11-17T08:34:43'
+                  nullable: true
+                authority_ref:
+                  type: string
+                  description: 'Must not be greater than 190 characters.'
+                  example: v
+                  nullable: true
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: true
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: d
+                  nullable: true
+    delete:
+      summary: ''
+      operationId: deleteApiV1OfficersOfficer_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SGSCHV95EMEDMJPC690
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SGSCHV95EMEDMJPC690
+      tags:
+        - Endpoints
+    parameters:
+      -
+        in: path
+        name: officer_id
+        description: 'The ID of the officer.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  '/api/v1/stores/{store_id}/officers':
+    get:
+      summary: 'Officers (Storekeepers etc.) who work in the store.'
+      operationId: officersStorekeepersEtcWhoWorkInTheStore
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SGZRS66VTP4WZ26T0Q2
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SGZRS66VTP4WZ26T0Q2
+      tags:
+        - Endpoints
+    put:
+      summary: ''
+      operationId: putApiV1StoresStore_idOfficers
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SHA4DEGSFC0Q06J1QJ4
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SHA4DEGSFC0Q06J1QJ4
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                officers:
+                  type: array
+                  description: ''
+                  example: null
+                  items:
+                    type: object
+                    properties:
+                      officer_id:
+                        type: integer
+                        description: 'Must match an existing stored value.'
+                        example: 16
+                      role:
+                        type: string
+                        description: 'Must not be greater than 30 characters.'
+                        example: 'n'
+                        nullable: true
+                      valid_from:
+                        type: string
+                        description: 'Must be a valid date.'
+                        example: '2026-11-17T08:34:43'
+                        nullable: true
+                      valid_to:
+                        type: string
+                        description: 'Must be a valid date.'
+                        example: '2026-11-17T08:34:43'
+                        nullable: true
+                    required:
+                      - officer_id
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: b
+                  nullable: true
+    parameters:
+      -
+        in: path
+        name: store_id
+        description: 'The ID of the store.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  '/api/v1/officers/{officer_id}/assignments':
+    get:
+      summary: ''
+      operationId: getApiV1OfficersOfficer_idAssignments
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SHHR43NMMP70JBNNYTC
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SHHR43NMMP70JBNNYTC
+      tags:
+        - Endpoints
+    post:
+      summary: 'New post (transfer / promotion). Closes the current assignment.'
+      operationId: newPosttransferPromotionClosesTheCurrentAssignment
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: Unauthenticated.
+                  code: UNAUTHENTICATED
+                  meta:
+                    request_id: 01M7MA9SHWNAMKNZP2BY56QBZY
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthenticated.
+                  code:
+                    type: string
+                    example: UNAUTHENTICATED
+                  meta:
+                    type: object
+                    properties:
+                      request_id:
+                        type: string
+                        example: 01M7MA9SHWNAMKNZP2BY56QBZY
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                designation_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                department_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                public_service_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                service_grade_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                  nullable: true
+                from_on:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-11-17T08:34:43'
+                authority_ref:
+                  type: string
+                  description: 'Must not be greater than 190 characters.'
+                  example: 'n'
+                  nullable: true
+                reason:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 255 characters.'
+                  example: g
+                  nullable: true
+              required:
+                - designation_id
+                - department_id
+                - from_on
+    parameters:
+      -
+        in: path
+        name: officer_id
+        description: 'The ID of the officer.'
+        example: 16
+        required: true
+        schema:
+          type: integer
