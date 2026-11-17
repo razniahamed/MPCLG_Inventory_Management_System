@@ -8,6 +8,7 @@ use App\Exceptions\ApiException;
 use App\Models\Officer;
 use App\Models\OfficerAssignment;
 use App\Services\Audit\AuditLogger;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -27,7 +28,8 @@ class OfficerService
     public function create(array $data): Officer
     {
         return DB::transaction(function () use ($data) {
-            $officer = $this->masterData->create(Officer::class, $data);
+            // authority_ref belongs to the opening assignment, not the officer row.
+            $officer = $this->masterData->create(Officer::class, Arr::except($data, ['authority_ref']));
 
             OfficerAssignment::create([
                 'officer_id' => $officer->id,
@@ -66,7 +68,7 @@ class OfficerService
         $leaving = $newStatus !== null && $newStatus !== $officer->employment_status && $newStatus->hasLeft();
 
         return DB::transaction(function () use ($officer, $data, $leaving) {
-            $officer = $this->masterData->update($officer, $data);
+            $officer = $this->masterData->update($officer, Arr::except($data, ['authority_ref']));
             $warnings = [];
 
             if ($leaving) {

@@ -107,9 +107,10 @@ it('creates an officer with an opening assignment and keeps history on transfer'
         'designation_id' => $designation->id,
         'department_id' => $from->id,
         'joined_on' => '2024-03-01',
+        'authority_ref' => 'APPT/2024/12',
     ])->assertCreated()->assertJsonPath('data.department.code', 'IT')->json('data.id');
 
-    expect(OfficerAssignment::where('officer_id', $officerId)->count())->toBe(1);
+    expect(OfficerAssignment::where('officer_id', $officerId)->sole()->authority_ref)->toBe('APPT/2024/12');
 
     // Direct department change is refused: history must be kept.
     $this->assertApiError($this->patchJson("/api/v1/officers/{$officerId}", ['department_id' => $to->id]), 422, 'BUSINESS_RULE_VIOLATION');

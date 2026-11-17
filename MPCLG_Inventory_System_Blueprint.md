@@ -68,7 +68,7 @@ A new internal web application for the Ministry of Provincial Councils and Local
 | Queue/cache | Database or Redis queue; cache for permission lookups | |
 | API docs | OpenAPI (Scribe or L5-Swagger) | Generated and kept up to date each phase |
 | Tests | Pest (or PHPUnit) | |
-| Frontend (Tier 1) | Separate SPA (Vue 3 or React) consuming the API | **Decision pending**, see Section 16 |
+| Frontend (Tier 1) | Separate SPA: React 19 + TypeScript + Vite, Material UI 9 (MUI X DataGrid), React Router, TanStack Query (`frontend/`) | **Decided** (Section 16, decision 2) |
 | Time | Store UTC, display `Asia/Colombo` | Consistent Sri Lanka time in the UI |
 | Languages | English first; columns ready for Sinhala/Tamil names | Confirm languages, Section 16 |
 
@@ -1084,7 +1084,7 @@ All paths are under `/api/v1`. The right-hand column is the permission required.
 | POST | `/users/{id}/suspend` · `/reactivate` · `/deactivate` | Lifecycle | `user.deactivate` / `user.reactivate` |
 | POST | `/users/{id}/reset-password` | Admin reset | `user.reset_password` |
 | POST | `/users/{id}/revoke-tokens` | Force logout | `user.revoke_tokens` |
-| GET | `/users/{id}/effective-permissions` | Why a user can/cannot do X (shows role/override source) | `permission.view` |
+| GET | `/users/{id}/effective-permissions` | Why a user can/cannot do X (shows role/override/delegation source). For a pending/suspended/locked account it returns what WOULD apply once active, with `account_active: false` | `permission.view` |
 | GET · PUT | `/users/{id}/roles` | Role assignments (scope, validity) | `permission.assign_role` |
 | GET | `/users/{id}/permissions` | Overrides list | `permission.view` |
 | PUT | `/users/{id}/permissions/{code}` | **Turn one permission allow/deny/inherit for one user** | `permission.override_user` |
@@ -1223,7 +1223,7 @@ Write a Pest feature test for **every endpoint** (allowed, denied, validation, e
 | # | Decision | Recommended assumption |
 |---|---|---|
 | 1 | Official ministry name for forms (chart: "Ministry of Public Administration, Provincial Council & Local Government"; proposal: "Ministry of Provincial Councils and Local Government") | Confirm before printing forms |
-| 2 | Frontend framework | Vue 3 + Vite (or React); separate SPA over the API |
+| 2 | Frontend framework | **Decided:** React 19 + Vite + Material UI 9, separate SPA over the API (`frontend/`) |
 | 3 | Laravel version / PHP version | **Decided:** Laravel 13 on PHP 8.4 (Phase 0) |
 | 4 | Custom RBAC vs `spatie/laravel-permission` | Custom tables (need per-user deny, scope, expiry) |
 | 5 | Hosting, VPN/network access, backups, retention, recovery targets | Agree with the ministry IT Division |

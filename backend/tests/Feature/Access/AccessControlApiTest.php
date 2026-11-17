@@ -148,8 +148,12 @@ it('switches one permission off globally for everyone', function () {
 it('lists the permission catalogue grouped by module', function () {
     $data = $this->getJson('/api/v1/permissions')->assertOk()->json('data');
 
+    $first = collect($data)->firstWhere('code', 'access')['permissions'][0];
+
     expect($data)->toHaveCount(10)
-        ->and(collect($data)->firstWhere('code', 'access')['permissions'])->not->toBeEmpty();
+        ->and($first['resource'])->toBeString()
+        ->and($first['action'])->toBeString()
+        ->and($first['module'])->toBe('access');
 });
 
 it('manages roles and their permission sets', function () {

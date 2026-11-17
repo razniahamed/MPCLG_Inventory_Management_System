@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enums\UserStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Access\AssignRolesRequest;
 use App\Http\Requests\Access\SetUserPermissionRequest;
@@ -69,8 +70,18 @@ class UserAccessController extends Controller
     /** Why a user can / cannot do each thing (shows role / override / delegation sources). */
     public function effectivePermissions(User $user, PermissionResolver $resolver): JsonResponse
     {
-        $rows = Permission::query()->with('module')->orderBy('code')->get()->map(function (Permission $permission) use ($user, $resolver) {
-            $decision = $resolver->explain($user, $permission->code);
+        // For a pending / suspended / locked account, show what it WOULD be able
+        // to do once active; `account_active` tells the client nothing applies now.
+        $accountActive = $user->isActive();
+        $probe = $user;
+        if (! $accountActive && $user->status !== UserStatus::Deactivated) {
+            $probe = clone $user;
+            $probe->status = UserStatus::Active;
+            $probe->locked_until = null;
+        }
+
+        $rows = Permission::query()->with('module')->orderBy('code')->get()->map(function (Permission $permission) use ($probe, $resolver) {
+            $decision = $resolver->explain($probe, $permission->code);
 
             return [
                 'code' => $permission->code,
@@ -90,6 +101,7 @@ class UserAccessController extends Controller
 
         return ApiResponse::success([
             'user' => ['id' => $user->public_id, 'username' => $user->username, 'status' => $user->status->value],
+            'account_active' => $accountActive,
             'permissions' => $rows,
         ]);
     }
